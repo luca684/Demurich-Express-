@@ -1,0 +1,150 @@
+make_zip.py
+
+
+import zipfile, os
+
+base_dir = "demurich-express-contact"
+assets_dir = os.path.join(base_dir, "assets")
+os.makedirs(assets_dir, exist_ok=True)
+
+index_html = """<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Demurich Express LLC — Contact</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header>
+    <strong>Demurich Express LLC</strong>
+  </header>
+
+  <main>
+    <h1>Contact & SMS Signup</h1>
+    <p class="small">Fill out the form below to receive updates by email and SMS. By checking the consent box you agree to receive SMS messages.</p>
+
+    <form id="contactForm" method="POST" action="https://formspree.io/f/YOUR_FORM_ID">
+      <div class="row">
+        <label for="name">Full name</label>
+        <input id="name" name="name" type="text" required />
+      </div>
+
+      <div class="row">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" required />
+      </div>
+
+      <div class="row">
+        <label for="phone">Mobile phone (include country code)</label>
+        <input id="phone" name="phone" type="text" required placeholder="+995 5xx xxxxxx" />
+      </div>
+
+      <div class="row">
+        <label for="message">Message (optional)</label>
+        <textarea id="message" name="message"></textarea>
+      </div>
+
+      <div class="row consent">
+        <input id="smsConsent" name="sms_consent" type="checkbox" required />
+        <div>
+          <label for="smsConsent" style="font-weight:700; margin:0;">I consent to receive SMS messages from Demurich Express LLC.</label>
+          <div class="small">
+            By checking this box, you agree to receive SMS messages to the number provided. See our
+            <a href="privacy.html" target="_blank">Privacy Policy</a> for details.
+            <strong>SMS consent is not shared with third parties.</strong>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+
+    <p class="small" style="margin-top:16px;">
+      You can withdraw consent at any time by contacting us at
+      <a href="mailto:Ops@demurich.com">Ops@demurich.com</a>.
+    </p>
+  </main>
+
+  <footer>
+    <div style="max-width:760px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;">
+      <span>© Demurich Express LLC</span>
+      <span><a class="footer-links" href="privacy.html">Privacy Policy</a></span>
+    </div>
+  </footer>
+</body>
+</html>
+"""
+
+style_css = """body { font-family: Arial, Helvetica, sans-serif; margin:0; padding:0; background:#f7f7f7; color:#222; }
+header, footer { background:#111; color:#fff; padding:16px 20px; }
+main { max-width:760px; margin:28px auto; padding:20px; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+h1 { margin-top:0; }
+label { display:block; margin:12px 0 6px; font-weight:600; }
+input[type="text"], input[type="email"], textarea { width:100%; padding:10px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box; }
+textarea { min-height:120px; }
+.row { margin-bottom:12px; }
+.consent { display:flex; align-items:flex-start; gap:10px; margin-top:8px; }
+.consent a { color:#0645AD; text-decoration:underline; }
+button { background:#0b79d0; color:#fff; border:none; padding:10px 16px; border-radius:4px; cursor:pointer; font-size:16px; }
+.footer-links { color:#ddd; font-size:14px; text-decoration:none; }
+.small { font-size:13px; color:#555; }
+"""
+
+privacy_html = """<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Privacy Policy — Demurich Express LLC</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header><strong>Demurich Express LLC</strong></header>
+  <main>
+    <h1>Privacy Policy</h1>
+    <p>This is a sample Privacy Policy placeholder for Demurich Express LLC. Update this page with your real privacy policy content.</p>
+    <p>We respect your privacy and do not share SMS consent or personal information with third parties.</p>
+    <p><a href="index.html">← Back to Contact Page</a></p>
+  </main>
+  <footer><div style="max-width:760px;margin:0 auto;">© Demurich Express LLC</div></footer>
+</body>
+</html>
+"""
+
+readme_txt = """Demurich Express Contact Form Package
+---------------------------------------
+
+This package includes a simple contact form for collecting user details and SMS consent.
+
+FILES:
+- index.html      Main contact form page
+- privacy.html    Placeholder for your privacy policy
+- assets/style.css CSS styling for both pages
+- readme.txt      This file
+
+INSTRUCTIONS:
+1. Replace "YOUR_FORM_ID" in index.html with your actual Formspree ID.
+2. Upload these files to your web host or GitHub Pages/Netlify.
+3. Edit privacy.html with your actual privacy policy text.
+4. Test the form to ensure submissions work correctly.
+"""
+
+# Write files
+with open(os.path.join(base_dir, "index.html"), "w") as f: f.write(index_html)
+with open(os.path.join(assets_dir, "style.css"), "w") as f: f.write(style_css)
+with open(os.path.join(base_dir, "privacy.html"), "w") as f: f.write(privacy_html)
+with open(os.path.join(base_dir, "readme.txt"), "w") as f: f.write(readme_txt)
+
+# Create zip
+zip_filename = "demurich-express-contact.zip"
+with zipfile.ZipFile(zip_filename, "w", zipfile.ZIP_DEFLATED) as zipf:
+    for root, _, files in os.walk(base_dir):
+        for file in files:
+            filepath = os.path.join(root, file)
+            arcname = os.path.relpath(filepath, os.path.dirname(base_dir))
+            zipf.write(filepath, arcname)
+
+print(f"✅ Created {zip_filename}")
